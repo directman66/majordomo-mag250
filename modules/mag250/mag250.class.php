@@ -1,0 +1,1612 @@
+<?php
+/**
+* milur 
+* @package project
+* @author Wizard <sergejey@gmail.com>
+* @copyright http://majordomo.smartliving.ru/ (c)
+* @version 0.1 (wizard, 10:01:31 [Jan 03, 2018])
+*/
+//
+//
+//ini_set('max_execution_time', '600');
+class mag250 extends module {
+/**
+* milur
+*
+* Module class constructor
+*
+* @access private
+*/
+function mag250() {
+  $this->name="mag250";
+  $this->title="mag250";
+  $this->module_category="<#LANG_SECTION_DEVICES#>";
+  $this->checkInstalled();
+}
+/**
+* saveParams
+*
+* Saving module parameters
+*
+* @access public
+*/
+function saveParams($data=0) {
+ $p=array();
+ if (IsSet($this->id)) {
+  $p["id"]=$this->id;
+ }
+ if (IsSet($this->view_mode)) {
+  $p["view_mode"]=$this->view_mode;
+ }
+ if (IsSet($this->edit_mode)) {
+  $p["edit_mode"]=$this->edit_mode;
+ }
+ if (IsSet($this->tab)) {
+  $p["tab"]=$this->tab;
+ }
+ return parent::saveParams($p);
+}
+/**
+* getParams
+*
+* Getting module parameters from query string
+*
+* @access public
+*/
+function getParams() {
+  global $id;
+  global $mode;
+  global $view_mode;
+  global $edit_mode;
+  global $tab;
+  if (isset($id)) {
+   $this->id=$id;
+  }
+  if (isset($mode)) {
+   $this->mode=$mode;
+  }
+  if (isset($view_mode)) {
+   $this->view_mode=$view_mode;
+  }
+  if (isset($edit_mode)) {
+   $this->edit_mode=$edit_mode;
+  }
+  if (isset($tab)) {
+   $this->tab=$tab;
+  }
+}
+/**
+* Run
+*
+* Description
+*
+* @access public
+*/
+function run() {
+ global $session;
+  $out=array();
+  if ($this->action=='admin') {
+   $this->admin($out);
+  } else {
+   $this->usual($out);
+  }
+  if (IsSet($this->owner->action)) {
+   $out['PARENT_ACTION']=$this->owner->action;
+  }
+  if (IsSet($this->owner->name)) {
+   $out['PARENT_NAME']=$this->owner->name;
+  }
+  $out['VIEW_MODE']=$this->view_mode;
+  $out['EDIT_MODE']=$this->edit_mode;
+  $out['MODE']=$this->mode;
+  $out['ACTION']=$this->action;
+  $out['TAB']=$this->tab;
+
+
+
+$cmd_rec = SQLSelectOne("SELECT VALUE FROM mag250_config where parametr='DEBUG'");
+$debug=$cmd_rec['VALUE'];
+
+$out['MSG_DEBUG']=$debug;
+
+
+
+ $this->search_devices($out);
+
+
+  $this->data=$out;
+//  $this->checkSettings();
+
+  
+  $p=new parser(DIR_TEMPLATES.$this->name."/".$this->name.".html", $this->data, $this);
+  $this->result=$p->result;
+}
+/**
+* BackEnd
+*
+* Module backend
+*
+* @access public
+*/
+function admin(&$out) {
+
+ $this->getConfig();
+// $this->search_devices($out);
+
+  if ($this->view_mode=='' || $this->view_mode=='info') {
+$this->search_devices($out);
+  }
+
+
+
+if ($this->view_mode=='scan') {
+
+$this->scan_device();
+//   $this->search_devices($out);
+}  
+
+if ($this->view_mode=='delete_devices') {
+$this->delete_once($this->id);
+}  
+
+  if ($this->view_mode=='edit_devices') {
+   $this->edit_devices($out, $this->id);
+    }
+
+
+
+  if ($this->view_mode=='turnon') {
+   $this->turnon($this->id);
+   $this->getinfo2($this->id, $debug);
+
+    }
+
+
+  if ($this->view_mode=='colorpicker') {
+ global $colorpicker;
+//sg('test.colorpicker',$colorpicker);
+$colorhex=substr($colorpicker,0,6);
+$cid=substr($colorpicker,7);
+
+
+$cmd_rec = SQLSelect("SELECT * FROM mag250_devices");
+$cid=$cmd_rec[0]['ID'];
+//sg('test.cid', $cid);
+
+$ar =(str_split($colorhex, 2));
+
+   $this->set_colorhex($cid, $ar[0],$ar[1],$ar[2]);
+   $this->getinfo2($cid, $debug);
+    }
+
+
+
+  if ($this->view_mode=='turnoff') {
+   $this->turnoff($this->id);
+   $this->getinfo2($this->id, $debug);
+    }
+
+  if (substr($this->view_mode,0,9)=='customdec') {
+$color=substr($this->view_mode,10);
+
+$ar=explode("@",$color);
+   $this->set_color($this->id, $ar[0],$ar[1],$ar[2]);
+   $this->getinfo2($this->id, $debug);
+    }
+
+//('test.br', substr($this->view_mode,0,9));
+//////////////////////////
+//////////////////////////
+sg('test.ccolor',substr($this->view_mode,0,11));
+  if (substr($this->view_mode,0,11)=='setcolorhex') {
+$color=substr($this->view_mode,12);
+//sg('test.customhex',$color);
+
+$ar =(str_split($color, 2));
+
+   $this->set_colorhex($this->id, $ar[0],$ar[1],$ar[2]);
+   $this->getinfo2($this->id, $debug);
+    }
+//////////////////////////
+//////////////////////////
+//sg('test.br', substr($this->view_mode,0,10));
+  if (substr($this->view_mode,0,10)=='brightness') {
+
+$brightness=substr($this->view_mode,10);
+//sg('test.br', $brightness);
+
+$this->brightness($this->id, $brightness);
+   $this->getinfo2($this->id, $debug);
+    }
+
+
+  if ($this->view_mode=='getinfo') {
+   $this->getinfo2($this->id, $debug);
+    }
+
+  if (substr($this->view_mode,0,11)=='set_favorit') {
+$color=substr($this->view_mode,12);
+
+$ar = hexdec(str_split($color, 2));
+
+   $this->set_favorit($this->id, $color);
+   $this->getinfo2($this->id, $debug);
+
+    }
+
+
+//sg('test.bra', $this->view_mode);
+}  
+
+
+ function propertySetHandle($object, $property, $value) {
+   $my_properties=SQLSelect("SELECT ID FROM mag250_devices WHERE LINKED_OBJECT LIKE '".DBSafe($object)."' AND LINKED_PROPERTY LIKE '".DBSafe($property)."'");
+   $total=count($my_properties);
+   if ($total) {
+    for($i=0;$i<$total;$i++) {
+     $this->setProperty($my_properties[$i]['ID'], $value);
+    }
+   }  
+ }
+
+ 
+function edit_devices(&$out, $id) {
+require(DIR_MODULES.$this->name . '/mag250_devices_edit.inc.php');
+}
+
+
+ function search_devices(&$out) {
+
+$mhdevices=SQLSelect("SELECT * FROM mag250_devices");
+$total = count($mhdevices);
+for ($i = 0; $i < $total; $i++)
+{ 
+$ip=$mhdevices[$i]['IP'];
+$lastping=$mhdevices[$i]['LASTPING'];
+//echo time()-$lastping;
+if (time()-$lastping>300) {
+$online=ping(processTitle($ip));
+    if ($online) 
+{SQLexec("update mag250_devices set ONLINE='1', LASTPING=".time()." where IP='$ip'");} 
+else 
+{SQLexec("update mag250_devices set ONLINE='0', LASTPING=".time()." where IP='$ip'");}
+}}
+
+
+  $mhdevices=SQLSelect("SELECT *, substr(CURRENTCOLOR,13,6) CCOLOR, substr(CURRENTCOLOR,10,2) BR, substr(CURRENTCOLOR,5,2) TURN FROM mag250_devices");
+  if ($mhdevices[0]['ID']) {
+   $out['DEVICES']=$mhdevices;
+
+    }
+
+}   
+
+
+ 
+
+	/**
+	* processCommand
+	*
+	* ...
+	*
+	* @access private
+	*/
+
+	function processCommand($device_id, $command, $value, $params = 0) {
+
+		$cmd_rec = SQLSelectOne("SELECT * FROM mag250_commands WHERE DEVICE_ID=".(int)$device_id." AND TITLE LIKE '".DBSafe($command)."'");
+
+		if (!$cmd_rec['ID']) {
+			$cmd_rec = array();
+			$cmd_rec['TITLE'] = $command;
+			$cmd_rec['DEVICE_ID'] = $device_id;
+			$cmd_rec['ID'] = SQLInsert('mag250_commands', $cmd_rec);
+		}
+
+		$old_value = $cmd_rec['VALUE'];
+
+		$cmd_rec['VALUE'] = $value;
+		$cmd_rec['UPDATED'] = date('Y-m-d H:i:s');
+		SQLUpdate('mag250_commands', $cmd_rec);
+
+      // Если значение метрики не изменилось, то выходим.
+      if ($old_value == $value) return;
+
+      // Иначе обновляем привязанное свойство.
+      if ($cmd_rec['LINKED_OBJECT'] && $cmd_rec['LINKED_PROPERTY']) {
+         setGlobal($cmd_rec['LINKED_OBJECT'] . '.' . $cmd_rec['LINKED_PROPERTY'], $value, array($this->name => '0'));
+      }
+
+      // И вызываем привязанный метод.
+      if ($cmd_rec['LINKED_OBJECT'] && $cmd_rec['LINKED_METHOD']) {
+         if (!is_array($params)) {
+            $params = array();
+         }
+         $params['VALUE'] = $value;
+         $params['OLD_VALUE'] = $old_value;
+         $params['NEW_VALUE'] = $value;
+
+         callMethodSafe($cmd_rec['LINKED_OBJECT'] . '.' . $cmd_rec['LINKED_METHOD'], $params);
+      }
+
+	}
+  
+ 
+
+/**
+* FrontEnd
+*
+* Module frontend
+*
+* @access public
+*/
+function usual(&$out) {
+ $this->admin($out);
+
+}
+/**
+
+*
+* @access public
+*/
+ 
+
+
+
+function checkSettings() {
+
+}
+
+
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+ function scan() {
+
+$ip = "255.255.255.255";
+$port = 48899;
+
+$str  = 'HF-A11ASSISTHREAD';
+
+
+		$cs = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+
+		if(!$cs){
+echo "error socket";
+		}
+
+		socket_set_option($cs, SOL_SOCKET, SO_REUSEADDR, 1);
+		socket_set_option($cs, SOL_SOCKET, SO_BROADCAST, 1);
+		socket_set_option($cs, SOL_SOCKET, SO_RCVTIMEO, array('sec'=>1, 'usec'=>128));
+		socket_bind($cs, 0, 0);
+
+socket_sendto($cs, $str, strlen($str), 0, $ip, $port);
+                    //socket_recvfrom($sock, $buf,100, 0, $ip, $port);
+		while(@socket_recvfrom($cs, $buf, 1024, 0, $ip, $port)){
+
+//sg('test.buf',$buf);
+
+
+
+			if($buf != NULL){
+if ($ip) {
+
+$par=explode(",",$buf);
+
+  $mhdevices=SQLSelect("SELECT * FROM mag250_devices where MAC='".$par[1]."' and IP='$ip'");
+ if ($mhdevices[0]['ID']) {} else 
+
+{ 
+$mac=$par[1];
+$par1=array();
+//$par1['ID'] = $id;
+//$par['TITLE'] = 'RGB LED';
+
+$par1['TITLE'] = $par[2];
+$par1['IP'] = $ip;
+$par1['PORT'] = $port;
+//$par1['MODEL'] = 'RGB DIMMER';
+$par1['MAC'] = $mac;
+$par1['FIND'] = date('m/d/Y H:i:s',time());		
+SQLInsert('mag250_devices', $par1);		 
+
+
+$id=SQLSelectOne("SELECT ID FROM mag250_devices where MAC='$mac'")['ID'];
+
+$cmd=SQLSelect("SELECT max(ID) ID FROM mag250_commands where DEVICE_ID='$id'");
+  if ( $cmd[0]['ID']) { null;} else {
+
+
+$commands=array('status','level', 'color');
+$total = count($commands);
+     for ($i = 0; $i < $total; $i++) {
+
+                $cmd_rec=array();
+               $cmd_rec['DEVICE_ID']=$id;
+               $cmd_rec['TITLE']=$commands[$i];
+               SQLInsert('mag250_commands',$cmd_rec);
+           
+}
+}
+}}
+ 			}
+		}
+
+		@socket_shutdown($cs, 2);
+		socket_close($cs);
+
+
+
+
+
+//$sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP); 
+//socket_set_option($sock, SOL_SOCKET, SO_BROADCAST, 1); 
+//socket_sendto($sock, $str, strlen($str), 0, $ip, $port);
+//socket_recvfrom($sock, $buf,100 , 0, $ip, $port);
+//usleep(100);
+//socket_close($sock);
+
+//        $buf = null;
+//        $data = null;
+//        if ($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
+//            socket_set_option($socket, SOL_SOCKET, SO_BROADCAST, 1); 
+//            socket_sendto($socket, $str, strlen($str), 0, $ip, $port);
+//while (($buffer = socket_read($socket, 1024))!=false) {
+//          $data = $data + $buffer;
+//    echo("Data sent was: time\nResponse was:" . $buffer . "\n");
+
+//}
+	 
+
+
+
+//}
+
+
+
+//$data="";
+//do {
+//        $buf = null;
+//        if (($len = @socket_recvfrom($sock, $buf, 1024, 0, $ip, $port)) == -1) {
+//            echo "socket_read() failed: " . socket_strerror(socket_last_error()) . "\n";
+//        }
+//        if(!is_null($buf)){
+//            $data = $data + $buf;
+//        }
+//    } while(!is_null($buf));
+//    socket_close($sock);
+
+
+
+//echo "Messagge : < $buf > , $ip : $port <br>";
+//$buf=$data;
+
+//$msg = bytearray();
+//$lead_byte = #0x51
+//sg('test.magichome',$buf .":".$ip.":".$port);
+
+/*
+if ($ip) {
+
+$par=explode(",",$buf);
+
+  $mhdevices=SQLSelect("SELECT * FROM magichome_devices where MAC='".$par[1]."' and IP='$ip'");
+  if ($mhdevices[0]['ID']) {} else 
+
+{  $mhdevices=SQLSelect("SELECT max(ID) ID FROM magichome_devices");
+  if ($mhdevices[0]['ID']) {
+   $id=$mhdevices[0]['ID']+1;} else $id=0;
+
+
+$par['ID'] = $id;
+//$par['TITLE'] = 'RGB LED';
+
+$par['TITLE'] = $par[2];
+$par['IP'] = $ip;
+$par['PORT'] = $port;
+$par['MAC'] = $par[1];
+$par['FIND'] = date('m/d/Y H:i:s',time());		
+SQLInsert('magichome_devices', $par);		 
+}
+}
+ */
+
+
+
+
+}
+
+ function edit_magichome_devices(&$out, $id) {
+  require(DIR_MODULES.$this->name.'/mag250_devices_edit.inc.php');
+ }
+
+
+
+
+
+
+function delete_once($id) {
+  SQLExec("DELETE FROM mag250_devices WHERE id=".$id);
+  $this->redirect("?");
+ }
+
+
+
+function turnon($id) {
+$cmd_rec = SQLSelectOne("SELECT IP, PORT FROM mag250_devices WHERE id=".$id);
+$host=$cmd_rec['IP'];
+
+$port=5577;
+
+
+$debug="";
+
+
+if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+    die("Couldn't create socket: [$errorcode] $errormsg \n");
+}
+
+//Connect socket to remote server
+if(!socket_connect($sock , $host , $port))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+
+}
+
+//71:23:0f:a3
+        $broadcast_string = chr(0x71).chr(0x23).chr(0x0f).chr(0xa3);
+
+        socket_sendto($sock, $broadcast_string, strlen($broadcast_string), 0, $host, $port);
+
+
+
+
+ }
+
+
+function turnoff($id) {
+
+$cmd_rec = SQLSelectOne("SELECT IP, PORT FROM mag250_devices WHERE id=".$id);
+$host=$cmd_rec['IP'];
+
+$port=5577;
+
+
+if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+    die("Couldn't create socket: [$errorcode] $errormsg \n");
+}
+
+//Connect socket to remote server
+if(!socket_connect($sock , $host , $port))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+
+}
+
+//71:24:0f:a4
+
+        $broadcast_string = chr(0x71).chr(0x24).chr(0x0f).chr(0xa4);
+
+        socket_sendto($sock, $broadcast_string, strlen($broadcast_string), 0, $host, $port);
+}
+
+
+function set_colordec($id, $R,$G,$B) {
+//color         1 1 1 	31:01:01:01:00:f0:0f:33
+
+$cmd_rec = SQLSelectOne("SELECT IP, PORT FROM mag250_devices WHERE id=".$id);
+$host=$cmd_rec['IP'];
+
+$port=5577;
+
+
+if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+    die("Couldn't create socket: [$errorcode] $errormsg \n");
+}
+
+//Connect socket to remote server
+if(!socket_connect($sock , $host , $port))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+
+}
+
+//71:24:0f:a4
+
+//        $broadcast_string = chr(0x71).chr(0x24).chr(0x0f).chr(0xa4);
+
+//color         1 1 1 	31:01:01:01:00:f0:0f:33
+//str_pad (27, 5,"0",STR_PAD_LEFT); 
+$HR=str_pad(dechex($R),2,"0");
+$HG=str_pad(dechex($G),2,"0");
+$HB=str_pad(dechex($B),2,"0");
+
+//$HR=dechex($R);
+//$HG=dechex($G);
+//$HB=dechex($B);
+
+//$message="31:01:01:01:00:f0:0f";
+$message="31:$HR:$HG:$HB:00:f0:0f";
+$message=str_replace(":","",$message);
+$message=$message.$this->csum($message);
+//sg('test.message', $message);
+$hexmessage=hex2bin($message);
+
+        socket_sendto($sock, $hexmessage, strlen($hexmessage), 0, $host, $port);
+        usleep(100);
+socket_close($sock);
+}
+
+
+function set_colorhex($id, $HR,$HG,$HB) {
+//color         1 1 1 	31:01:01:01:00:f0:0f:33
+
+$cmd_rec = SQLSelectOne("SELECT IP, PORT FROM mag250_devices WHERE id=".$id);
+$host=$cmd_rec['IP'];
+
+$port=5577;
+
+
+if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+    die("Couldn't create socket: [$errorcode] $errormsg \n");
+}
+
+//Connect socket to remote server
+if(!socket_connect($sock , $host , $port))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+
+}
+
+//71:24:0f:a4
+
+//        $broadcast_string = chr(0x71).chr(0x24).chr(0x0f).chr(0xa4);
+
+//color         1 1 1 	31:01:01:01:00:f0:0f:33
+//str_pad (27, 5,"0",STR_PAD_LEFT); 
+//$HR=str_pad(dechex($R),2,"0");
+//$HG=str_pad(dechex($G),2,"0");
+//$HB=str_pad(dechex($B),2,"0");
+
+//$HR=dechex($R);
+//$HG=dechex($G);
+//$HB=dechex($B);
+
+//$message="31:01:01:01:00:f0:0f";
+$message="31:$HR:$HG:$HB:00:f0:0f";
+$message=str_replace(":","",$message);
+$message=$message.$this->csum($message);
+//sg('test.message', $message);
+$hexmessage=hex2bin($message);
+
+        socket_sendto($sock, $hexmessage, strlen($hexmessage), 0, $host, $port);
+        usleep(100);
+socket_close($sock);
+}
+
+
+
+function brightness($id, $brightness) {
+//color         1 1 1 	31:01:01:01:00:f0:0f:33
+
+$cmd_rec = SQLSelectOne("SELECT IP, PORT FROM mag250_devices WHERE id=".$id);
+$host=$cmd_rec['IP'];
+
+$port=5577;
+
+
+if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+    die("Couldn't create socket: [$errorcode] $errormsg \n");
+}
+
+//Connect socket to remote server
+if(!socket_connect($sock , $host , $port))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+
+}
+
+//31:00:00:00:05:0f:0f:54 //1%
+//31:00:00:00:7f:0f:0f:ce //50%
+//31:00:00:00:ff:0f:0f:4e //100 %
+
+
+//        $broadcast_string = chr(0x71).chr(0x24).chr(0x0f).chr(0xa4);
+
+//color         1 1 1 	31:01:01:01:00:f0:0f:33
+//str_pad (27, 5,"0",STR_PAD_LEFT); 
+$BR=str_pad(dechex($brightness),2,"0");
+
+//$HR=dechex($R);
+//$HG=dechex($G);
+//$HB=dechex($B);
+
+//$message="31:01:01:01:00:f0:0f";
+$message="31:00:00:00:".$BR.":f0:0f";
+$message=str_replace(":","",$message);
+$message=$message.$this->csum($message);
+//sg('test.message', $message);
+$hexmessage=hex2bin($message);
+
+        socket_sendto($sock, $hexmessage, strlen($hexmessage), 0, $host, $port);
+        usleep(100);
+socket_close($sock);
+}
+
+
+
+
+function getinfo2($id) {
+$cmd_rec = SQLSelectOne("SELECT IP, PORT FROM mag250_devices WHERE id=".$id);
+$host=$cmd_rec['IP'];
+
+$port=5577;
+
+
+if(!($sock = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"))))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+    die("Couldn't create socket: [$errorcode] $errormsg \n");
+}
+
+//Connect socket to remote server
+if(!socket_connect($sock , $host , $port))
+{
+    $errorcode = socket_last_error();
+    $errormsg = socket_strerror($errorcode);
+
+
+}
+//81:8a:8b:96
+$message="81:8a:8b";
+$message=str_replace(":","",$message);
+$message=$message.$this->csum($message);
+//sg('test.message', $message);
+$hexmessage=hex2bin($message);
+
+        socket_sendto($sock, $hexmessage, strlen($hexmessage), 0, $host, $port);
+//        usleep(100);
+/*
+        do
+        {
+                $pkt = fread($sock, 10);
+                if ( !empty($pkt) && ord($pkt[0]) == 0xAA )
+                echo ord($pkt[1]).".".ord($pkt[2]).".".ord($pkt[3]).".".ord($pkt[4])."\n";
+        }
+        while ( $pkt != false );
+*/
+
+            $receiveStr = "";
+            $receiveStr = socket_read($sock, 1024, PHP_BINARY_READ);  // The 2 band data received 
+                      $receiveStrHex = bin2hex ($receiveStr);   // the 2 hexadecimal data convert 16 hex
+
+
+
+
+//$debug.="Message [$broadcast_string] send successfully <br>";
+
+//$receiveStr = socket_read($socket, 1024, PHP_BINARY_READ);  // The 2 band data received 
+//$receiveStrHex = bin2hex ($pkt);   // the 2 hexadecimal data convert 16 hex
+//$receiveStrHex =  ($pkt);   // the 2 hexadecimal data convert 16 hex
+
+//$receiveStrHex = ord($pkt[1]).".".ord($pkt[2]).".".ord($pkt[3]).".".ord($pkt[4]);
+
+// $debug.= "Received message [$receiveStr] <br>";
+//sg('test.answ',  $receiveStrHex);
+
+
+//	813323612105ff00000003000060 //R
+//	81332361210500ff000003000060    //G
+//	8133236121050000ff0003000060       //B
+
+SQLexec("update magichome_config set value='$receiveStrHex' where parametr='DEBUG'");
+
+socket_close($sock);
+
+
+
+
+
+
+// $sendStr = '81:8a:8b:96'; 
+//        $sendStrArray = str_split(str_replace(':', '', $sendStr), 2);  // The 16 binary data into a set of two arrays
+/*
+//   $socket = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"));  // Create Socket
+        if (socket_connect($socket, $host, $port)) {  //Connect
+
+        $sendStrArray = str_split(str_replace(':', '', $sendStr), 2);  // The 16 binary data into a set of two arrays
+     
+                      for ($j = 0; $j <count ($sendStrArray); $j++) {
+                              socket_write ($socket, Chr (hexdec ($sendStrArray[$j])));   // by group data transmission
+            }
+            $receiveStr = "";
+            $receiveStr = socket_read($socket, 1024, PHP_BINARY_READ);  // The 2 band data received 
+                      $receiveStrHex = bin2hex ($receiveStr);   // the 2 hexadecimal data convert 16 hex
+
+socket_close($sock);
+}
+*/
+
+//$buf=$receiveStr;
+$buf= $receiveStrHex;
+
+
+//$sock = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP); 
+//socket_sendto($sock,  $sendStr, strlen( $sendStr), 0, $host, $port);
+//socket_recvfrom($sock, $buf,100 , 0, $host, $port);
+//socket_close($sock);
+
+//   $socket = socket_create(AF_INET, SOCK_STREAM, getprotobyname("tcp"));  // Create Socket
+//        if (socket_connect($socket, $host, $port)) {  //Connect
+
+
+//        $sendStrArray = str_split(str_replace(':', '', $sendStr), 2);  // The 16 binary data into a set of two arrays
+ 
+//                    for ($j = 0; $j <count ($sendStrArray); $j++) {
+//                           socket_write ($socket, Chr (hexdec ($sendStrArray[$j])));   // by group data transmission
+
+//            }
+//socket_recvfrom($sock, $buf,100 , 0, $ip, $port);
+//socket_close($sock);
+
+
+
+
+//        $command[] = 0x55; //last byte always 0x55, will appended to all commands
+//        $command[] = 0x710x240xF00x0F; //last byte always 0x55, will appended to all commands
+//        $message = vsprintf(str_repeat('%c', count($command)), $command);
+//        if ($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) {
+//            socket_sendto($socket, $message, strlen($message), 0, $host, $port);
+//            socket_close($socket);
+///            usleep($this->getDelay()); //wait 100ms before sending next command
+ 
+
+// }
+//sg('test.rgbbuf', $host.":".$port.":".$buf);
+SQLexec("update mag250_devices set CURRENTCOLOR='$buf' where id='$id'");
+
+}
+
+
+function set_favorit($id, $color) {
+  SQLExec("update mag250_devices set FAVORITCOLOR='$color' WHERE id=".$id);
+  $this->redirect("?");
+ }
+
+
+
+
+
+function changerandom($id) {
+ }
+
+
+
+/**
+*
+* @access public
+*/
+ 
+/**
+* milur_devices delete record
+*
+* @access public
+*/
+ 
+/**
+* Install
+*
+* Module installation routine
+*
+* @access private
+*/
+ function install($data='') {
+  parent::install();
+ }
+/**
+* Uninstall
+*
+* Module uninstall routine
+*
+* @access public
+*/
+ function uninstall() {
+   parent::uninstall();
+  SQLExec('DROP TABLE IF EXISTS mag250_devices');
+  SQLExec('DROP TABLE IF EXISTS mag250_config');
+  SQLExec('DROP TABLE IF EXISTS mag250_commands');
+
+
+ }
+/**
+* dbInstall
+*
+* Database installation routine
+*
+* @access private
+*/
+ function dbInstall($data = '') {
+
+ $data = <<<EOD
+ mag250_devices: ID int(10) unsigned NOT NULL auto_increment
+ mag250_devices: TITLE varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: IP varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: PORT varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: MAC varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: ONLINE varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: LASTPING varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: FAVORITCOLOR varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: CURRENTCOLOR varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: FIND varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: MODEL varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: LINKED_OBJECT varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: LINKED_PROPERTY varchar(100) NOT NULL DEFAULT ''
+EOD;
+  parent::dbInstall($data);
+
+
+ $data = <<<EOD
+ mag250_commands: ID int(10) unsigned NOT NULL auto_increment
+ mag250_commands: TITLE varchar(100) NOT NULL DEFAULT ''
+ mag250_commands: VALUE varchar(255) NOT NULL DEFAULT ''
+ mag250_commands: DEVICE_ID int(10) NOT NULL DEFAULT '0'
+ mag250_commands: LINKED_OBJECT varchar(100) NOT NULL DEFAULT ''
+ mag250_commands: LINKED_PROPERTY varchar(100) NOT NULL DEFAULT ''
+ mag250_commands: LINKED_METHOD varchar(100) NOT NULL DEFAULT '' 
+ mag250_commands: UPDATED datetime
+EOD;
+  parent::dbInstall($data);
+
+ $data = <<<EOD
+ mag250_config: parametr  varchar(300) 
+ mag250_config: value varchar(10000)  
+EOD;
+  parent::dbInstall($data);
+
+  $mhdevices=SQLSelect("SELECT *  FROM magichome_commands");
+  if ($mhdevices[0]['ID']) 
+
+{}else{
+
+$par=array();		 
+$par['TITLE'] = 'command';
+$par['ID'] = "1";		 
+SQLInsert('mag250_commands', $par);		 
+
+$par['TITLE'] = 'color';
+$par['ID'] = "2";		 
+SQLInsert('mag250_commands', $par);		 
+                	
+$par['TITLE'] = 'level';
+$par['ID'] = "3";		 
+SQLInsert('mag250_commands', $par);		 
+
+$par['TITLE'] = 'status';
+$par['ID'] = "4";		 
+SQLInsert('mag250_commands', $par);		 
+
+
+$par2=array();		 
+$par2['parametr'] = 'DEBUG';
+$par2['value'] = "";		 
+SQLInsert('mag250_config', $par2);		 
+}
+
+
+ }
+
+function csum($str)
+{
+$ar=str_split ($str,2);
+
+ $csum=0;
+ for ($j = 0; $j <count ($ar); $j++) {
+ $csum=$csum+hexdec($ar[$j]);
+ }
+return substr(dechex($csum),-2);
+}
+
+
+
+
+
+function scan_device()
+    {
+    $arr = array(
+        'protocol' => 'remote_stb_1.0',
+        'port' => 6777
+    );
+    $post_data = json_encode($arr);
+
+    // create socket
+    $sock = socket_create(AF_INET, SOCK_DGRAM, 0);
+    socket_set_option($sock, SOL_SOCKET, SO_BROADCAST, 1);
+    socket_bind($sock, 0, 6777);
+    socket_sendto($sock, $post_data, strlen($post_data) , 0, '255.255.255.255', 6000);
+    socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, array(
+        "sec" => 1,
+        "usec" => 10
+    ));
+$ret='';
+    $response = array();
+    do
+        {
+        $buf = null;
+        @socket_recvfrom($sock, $buf, 2048, 0, $host, $sport);
+        if (!is_null($buf))
+            {
+            $response[] = $buf;
+//            echo "<br />Messagge : < $buf > ,  $host : $sport <br />";
+            }
+        }
+
+    while (!is_null($buf));
+
+{
+  if (is_array($response)) {
+   foreach($response as $pars) {
+
+$par=json_decode($pars, true);
+
+echo "1".$par."<br>";
+echo "1".$par['type'];
+
+$model=$par['type'];
+$ip=$par['type'];
+$sn=$par['serialNumber'];
+$sh=$par['screenHeight'];
+$sw=$par['screenWidth'];
+$port=$par['port'];
+$prot=$par['protocolVersion'];
+$modes=$par['modes'];
+$ip=$host;
+
+
+  $mhdevices=SQLSelect("SELECT * FROM mag250_devices where MAC='".$sn."' and IP='$ip'");
+ if ($mhdevices[0]['ID']) {} else 
+
+{ 
+$mac=$par[1];
+$par1=array();
+
+$par1['TITLE'] = $model;
+$par1['IP'] = $ip;
+$par1['PORT'] = $port;
+//$par1['MODEL'] = 'RGB DIMMER';
+$par1['MAC'] = $sn;
+$par1['FIND'] = date('m/d/Y H:i:s',time());		
+SQLInsert('mag250_devices', $par1);		 
+}
+}
+
+    }}}
+
+// 1 - shift - 134217728
+// 2 - ctrl - 67108864
+// metastate in center
+/*
+function key_keyboard($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardRequest"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_play($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 1,
+        "keycode" => 114,
+        "unicode" => chr(114) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_ffwd($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 1,
+        "keycode" => 102,
+        "unicode" => chr(102) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_rew($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 1,
+        "keycode" => 98,
+        "unicode" => chr(98) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_guide($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 119,
+        "unicode" => chr(119) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_tv($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 122,
+        "unicode" => chr(122) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_app($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 123,
+        "unicode" => chr(123) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_info($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 1,
+        "keycode" => 121,
+        "unicode" => chr(121) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_exit($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 27,
+        "unicode" => chr(27) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_back($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 8,
+        "unicode" => chr(8) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_menu($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 122,
+        "unicode" => chr(122) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_blue($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 115,
+        "unicode" => chr(115) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_yellow($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 114,
+        "unicode" => chr(114) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_green($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 113,
+        "unicode" => chr(113) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_red($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 112,
+        "unicode" => chr(112) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_setting($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 2,
+        "keycode" => 120,
+        "unicode" => chr(120) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_power($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 1,
+        "keycode" => 117,
+        "unicode" => chr(117) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_mute($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 1,
+        "keycode" => 96,
+        "unicode" => chr(96) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_reload($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 116,
+        "unicode" => chr(116) ,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_1($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 49,
+        "unicode" => 1,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_2($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 50,
+        "unicode" => 2,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_3($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 51,
+        "unicode" => 3,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_4($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 52,
+        "unicode" => 4,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_5($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 53,
+        "unicode" => 5,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_6($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 54,
+        "unicode" => 6,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_7($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 55,
+        "unicode" => 7,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_8($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 56,
+        "unicode" => 8,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_9($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 57,
+        "unicode" => 9,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+function key_0($ip, $password)
+    {
+    $command = array(
+        "msgType" => "keyboardKey",
+        "action" => "press",
+        "metaState" => 0,
+        "keycode" => 48,
+        "unicode" => 0,
+        "action" => "press"
+    );
+    $answer = send_command($ip, $command, $password);
+    return $answer;
+    };
+
+// send command to device and wait answer from device 1-ok 0-false
+// command must be array
+function send_command($ip, $command, $password)
+    {
+
+    // create socket
+    $sock = socket_create(AF_INET, SOCK_DGRAM, 0);
+    socket_set_option($sock, SOL_SOCKET, SO_BROADCAST, 1);
+    socket_bind($sock, 0, 6777);
+
+    // convert array to json
+    $command = json_encode($command);
+
+    // coded to aes-256-cbc
+    $post_data = encrypt_answer($command, $password);
+
+    // send command
+    socket_sendto($sock, $post_data, strlen($post_data) , 0, $ip, 7666);
+    socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, array(
+        "sec" => 1,
+        "usec" => 10
+    ));
+
+    // recive command
+    do
+        {
+        $buf = null;
+        @socket_recvfrom($sock, $buf, 1024, 0, $host, $ports);
+        if (!is_null($buf))
+            {
+            $plaintext = $buf;
+            }
+        }
+    while (!is_null($buf));
+    socket_close($sock);
+    return decrypt_answer($plaintext, $password);
+    }
+
+// decription text
+function decrypt_answer($text, $password)
+    {
+    $iv = 'erghnlhbnmbnkghy';
+    $result = openssl_decrypt($text, 'AES-256-CBC', $password, OPENSSL_RAW_DATA, $iv);
+    return $result;
+    };
+
+// encription text
+function encrypt_answer($text, $password)
+    {
+    $iv = 'erghnlhbnmbnkghy';
+    $result = openssl_encrypt($text, 'AES-256-CBC', $password, OPENSSL_RAW_DATA, $iv);
+    return $result;
+    };
+
+*/
+
+}
+// --------------------------------------------------------------------
+	
+
+
+/*
+*
+* TW9kdWxlIGNyZWF0ZWQgSmFuIDAzLCAyMDE4IHVzaW5nIFNlcmdlIEouIHdpemFyZCAoQWN0aXZlVW5pdCBJbmMgd3d3LmFjdGl2ZXVuaXQuY29tKQ==
+*
+*/
+
+
+//info          81:8a:8b:96
+//Р Р†Р С”Р В» 		71:23:0f:a3
+//Р Р†РЎвЂ№Р С”Р В» 		71:24:0f:a4
+//color         1 1 1 	31:01:01:01:00:f0:0f:33
+//3100:00:00:00:f0:0f:30
+//3100ff0000f00f2f
+//  3100ff0000f00f2f
+//  3100ff0000f00f2f
+//31ff:ff:ff:00:f0:0f:2d
+//31ff:00:ff:00:f0:0f:2e
+//31ff:ff:00:00:f0:0f:2e
+	
+
+//level
+//31:00:00:00:05:0f:0f:54 //1%
+//31:00:00:00:7f:0f:0f:ce //50%
+//31:00:00:00:ff:0f:0f:4e //100 %
+
+
+// sudo tcpdump  ip dst 192.168.1.82 and  ip src 192.168.1.39 -w dump.cap
+
