@@ -1,0 +1,528 @@
+<link rel="stylesheet" href="../templates/xiaomimiio/css/bootstrap-select.min.css">
+
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+	[#if OK#]
+	<div class="alert alert-success"><#LANG_DATA_SAVED#></div>
+	[#endif OK#]
+	
+	[#if ERR#]
+	<div class="alert alert-error"><#LANG_FILLOUT_REQURED#></div>
+	[#endif ERR#]
+	
+	<fieldset>
+		[#if ID=""#]
+		<legend><#LANG_ADD#> <#LANG_DEVICE#></legend>
+		[#endif ID#]
+
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
+				<#LANG_TITLE#> (*):
+			</label>
+			<div class="col-lg-4"><input type="text" class="form-control" name="title" value="[#TITLE#]" id="title"></div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_IP#] style="color:red;font-weight:bold"[#endif#]>
+				IP (*):
+			</label>
+			<div class="col-lg-4"><input type="text" class="form-control" name="ip" value="[#IP#]" id="ip"></div>
+		</div>
+
+
+		[#if SERIAL!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label">
+				<#LANG_SERIAL#>:
+			</label>
+			<div class="col-lg-4">[#SERIAL#]</div>
+		</div>
+		[#endif#]
+
+		[#if DEVICE_TYPE_CODE!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label">
+				<#LANG_CODE#>:
+			</label>
+			<div class="col-lg-4">[#DEVICE_TYPE_CODE#]</div>
+		</div>
+		[#endif#]
+
+      [#if DEVICE_TYPE="lumi.gateway.v3" || DEVICE_TYPE="lumi.acpartner.v3"#]
+      <div class="form-group">
+         <label class="col-lg-3 control-label">
+            <#LANG_XIMI_APP_LAN_MODE#>:
+         </label>
+         <div class="col-lg-8">
+            [#if LAN_KEY!=""#]
+               <span class="label label-success"><#LANG_XIMI_APP_ACTIVE#></span>&nbsp&nbsp
+               <b><#LANG_XIMI_APP_KEY#>:</b> [#LAN_KEY#]&nbsp&nbsp
+               <span onclick="lanModeOff();" data-toggle="modal" data-target="#lan_mode" class="btn btn-default [#if TOKEN=="" || DEVICE_TYPE==""#]disabled[#endif#]" title="<#LANG_XIMI_APP_DEACTIVATE_LAN_MODE#>" id="[#IP#]"><#LANG_XIMI_APP_OFF#></span>
+            [#else LAN_KEY#]
+               <span class="label label-warning"><#LANG_XIMI_APP_NOTACTIVE#></span>&nbsp&nbsp
+               <span onclick="lanModeOn();" data-toggle="modal" data-target="#lan_mode" class="btn btn-default [#if TOKEN=="" || DEVICE_TYPE==""#]disabled[#endif#]" title="<#LANG_XIMI_APP_ACTIVATE_LAN_MODE#>" id="[#IP#]"><#LANG_XIMI_APP_ON#></span>
+            [#endif LAN_KEY#]
+            <div id="lan_mode_alert"></div>
+         </div>
+      </div>
+      [#endif#]
+
+		[#if MAC!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_MAC#] style="color:red;font-weight:bold"[#endif#]>
+				MAC:
+			</label>
+			<div class="col-lg-4">[#MAC#]</div>
+		</div>
+		[#endif#]
+		
+		[#if MODEL!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_MODEL#] style="color:red;font-weight:bold"[#endif#]>
+				MODEL:
+			</label>
+			<div class="col-lg-4">[#MODEL#]</div>
+		</div>
+		[#endif#]
+		
+		[#if HW_VER!=""#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label"[#if ERR_HW_VER#] style="color:red;font-weight:bold"[#endif#]>
+				HW_VER:
+			</label>
+			<div class="col-lg-4">[#HW_VER#]</div>
+		</div>
+		[#endif#]
+		
+      [#if DEVICE_TYPE="chuangmi.ir.v2" || DEVICE_TYPE="lumi.acpartner.v3"#]
+		<div class="form-group">
+			<label class="col-lg-3 control-label">
+				<#LANG_XIMI_APP_TEACH1#>:
+			</label>
+			<div class="col-lg-4">
+				<span onclick="" data-toggle="modal" data-target="#ir_learn" class="btn btn-success [#if TOKEN=="" || DEVICE_TYPE==""#]disabled[#endif#]" title="<#LANG_XIMI_APP_TEACH2#>" id="[#IP#]"><#LANG_XIMI_APP_TEACH#></span>
+			</div>
+		</div>
+		[#endif#]
+		
+		<div class="form-group">
+			<div class="col-lg-offset-3 col-lg-4">
+				[#if ID!=""#]
+				<button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_SUBMIT#></button>
+				[#else ID#]
+				<button type="submit" name="subm" value="Add" class="btn btn-primary"><#LANG_ADD#></button>
+				[#endif ID#]
+				<a href="?data_source=<#DATA_SOURCE#>" class="btn btn-default "><#LANG_STRING_BACK#></a>
+				<input type="hidden" name="id" value="<#ID#>">
+				<input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
+				<input type="hidden" name="edit_mode" value="<#EDIT_MODE#>">
+				<input type="hidden" name="mode" value="update">
+				<input type="hidden" name="data_source" value="<#DATA_SOURCE#>">
+				<input type="hidden" name="tab" value="<#TAB#>">
+			</div>
+		</div>
+	</fieldset>
+</form>
+
+[#if DEVICE_TYPE="lumi.gateway.v3" || DEVICE_TYPE="lumi.acpartner.v3"#]
+<script type="text/javascript">
+
+   function generateKey() {
+      const CHARS = '0123456789abcdefghijklmnopqrstuvwxyz';
+      let result = '';
+      for(let i=0; i<16; i++) {
+         let idx = Math.floor(Math.random() * CHARS.length);
+         result += CHARS[idx];
+      }
+      return result;
+   }
+
+   function tabUpdate() {
+      var link = $('#general-tab-link')[0];
+      var linkEvent = document.createEvent('MouseEvents');
+      linkEvent.initEvent('click', true, true);
+      link.dispatchEvent(linkEvent);
+      e.preventDefault();
+   }
+
+   function lanModeOff(){
+      var yesno = confirm("<#LANG_XIMI_APP_LAN_MODE_OFF_ASK#>");
+      if (yesno) {
+         var url = '/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=set_lumi_dpf_aes_key&dopt=[""]';
+         var token = "[#TOKEN#]";
+         var ip = "[#IP#]";
+
+         $("#lan_mode_alert").html('');
+
+         if (token !== '' && ip !== '') {
+            $.ajax({
+               url: url,
+               cache: false,
+               success: function(html){
+                  var resp = tryParseJSON(html);
+                  if (resp !== false) {
+                     $("#lan_mode_alert").html('<div class="alert alert-success" role="alert"><#LANG_XIMI_APP_LAN_MODE_OFF#>.</div>');
+                     var url = "/ajax/xiaomimiio.html?op=single_prop_update&did=[#ID#]&dcmd=get_lumi_dpf_aes_key&dopt=[]";
+                     $.ajax({
+                        url: url,
+                        cache: false,
+                        success: function(html){
+                           setTimeout('tabUpdate()', 1000);
+                        }
+                     });
+                  } else {
+                     $("#lan_mode_alert").html('<div class="alert alert-warning" role="alert"><#LANG_XIMI_APP_ERROR#>.</div>');
+                  }
+               }
+            });
+         } else {
+            $("#lan_mode_alert").html('<div class="alert alert-warning" role="alert"><#LANG_XIMI_APP_ERROR#>.</div>');
+         }
+      }
+   }
+
+   function lanModeOn(){
+      var yesno = confirm("<#LANG_XIMI_APP_LAN_MODE_ON_ASK#>");
+      if (yesno) {
+         var key = generateKey();
+         var url = '/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=set_lumi_dpf_aes_key&dopt=["'+key+'"]';
+         var token = "[#TOKEN#]";
+         var ip = "[#IP#]";
+
+         $("#lan_mode_alert").html('');
+
+         if (token !== '' && ip !== '') {
+            $.ajax({
+               url: url,
+               cache: false,
+               success: function(html){
+                  var resp = tryParseJSON(html);
+                  if (resp !== false) {
+                     $("#lan_mode_alert").html('<div class="alert alert-success" role="alert"><#LANG_XIMI_APP_LAN_MODE_ON#>.</div>');
+                     var url = "/ajax/xiaomimiio.html?op=single_prop_update&did=[#ID#]&dcmd=get_lumi_dpf_aes_key&dopt=[]";
+                     $.ajax({
+                        url: url,
+                        cache: false,
+                        success: function(html){
+                           setTimeout('tabUpdate()', 1000);
+                        }
+                     });
+                  } else {
+                     $("#lan_mode_alert").html('<div class="alert alert-warning" role="alert"><#LANG_XIMI_APP_ERROR#>.</div>');
+                  }
+               }
+            });
+         } else {
+            $("#lan_mode_alert").html('<div class="alert alert-warning" role="alert"><#LANG_XIMI_APP_ERROR#>.</div>');
+         }
+      }
+   }
+
+   function tryParseJSON (jsonString){
+      try {
+         var o = JSON.parse(jsonString);
+         if (o && typeof o === "object") return o;
+      }
+      catch (e) { }
+      return false;
+   };
+
+</script>
+[#endif#]
+
+[#if DEVICE_TYPE="chuangmi.ir.v2" || DEVICE_TYPE="lumi.acpartner.v3"#]
+<div class="modal fade" id="ir_learn" tabindex="-1" role="dialog" aria-labelledby="about1" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only"><#LANG_XIMI_APP_CLOSE#></span></button>
+            <b><#LANG_XIMI_APP_TEACH2#></b>
+         </div>
+         <div class="modal-body">
+            <div class="row">
+               <div class="float-right">
+                  [#if DEVICE_TYPE="chuangmi.ir.v2"#]
+                     <img src="../templates/xiaomimiio/img/mi_ir_learn.png" class="img-rounded">
+                  [#endif#]
+                  [#if DEVICE_TYPE="lumi.acpartner.v3"#]
+                     <img src="../templates/xiaomimiio/img/aqara_ir_learn.png" class="img-rounded">
+                  [#endif#]
+               </div>
+               <p class="float-left">
+                  [#if DEVICE_TYPE="chuangmi.ir.v2"#]
+                     <#LANG_XIMI_APP_TEACH_TEXT#>
+                  [#endif#]
+                  [#if DEVICE_TYPE="lumi.acpartner.v3"#]
+                     <#LANG_XIMI_APP_TEACH_TEXT_AQARA#>
+                  [#endif#]
+               </p>
+               <br><br>
+               <div>
+                  <button class="btn btn-primary" onclick="startLearnIR();"><#LANG_XIMI_APP_START#></button>&nbsp;&nbsp;&nbsp;<b><i id="ir_learn_timer"></i></b>
+               </div>
+            </div>
+            <div class="row">
+               <br>
+               <div>
+                  <pre class="pre-scrollable" id="ir_learn_log" style="word-wrap: break-word;"></pre>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+   [#if DEVICE_TYPE="chuangmi.ir.v2"#]
+   <script>
+      function startLearnIR() {
+
+         var slot=getRandomInt(1,100000);
+         var dopt='{"key":"'+slot+'"}';
+         var url="/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=miIO.ir_learn&dopt="+dopt;
+
+         $("#ir_learn_log").html('');
+
+         Data = new Date();
+         Hour = ('0' + Data.getHours()).slice(-2);
+         Minutes = ('0' + Data.getMinutes()).slice(-2);
+         Seconds = ('0' + Data.getSeconds()).slice(-2);
+
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' ip = '+'[#IP#]'+'<br>');
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' token = '+'[#TOKEN#]'+'<br>');
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+url+'<br>');
+
+         $.ajax({
+            url: url,
+            cache: false,
+            success: function(html){
+               //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+html+'<br>');
+               var resp = tryParseJSON(html);
+               if (resp !== false) {
+                  if(typeof resp.error === 'undefined') {
+                     if((typeof resp.result !== 'undefined') && (resp.result === 0)) {
+                        $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_TRAINING#>.<br>');
+                        if($("#ir_learn_timer").html()=='') {
+                           $('#ir_learn_timer').html('10');
+                           setTimeout('learnTimer('+slot+')', 1000);
+                        }
+                     } else {
+                        $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_STRING_ERROR#> - bad response.<br>');
+                     }
+                  } else {
+                     $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_STRING_ERROR#> - '+resp.error.message+'<br>');
+                  }
+               } else {
+                  $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_ERROR#>.<br>');
+               }
+            }
+         });
+      }
+
+      function learnTimer(slot) {
+         var obj = document.getElementById('ir_learn_timer');
+         var dopt='{"key":"'+slot+'"}';
+         var url="/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=miIO.ir_read&dopt="+dopt;
+
+         Data = new Date();
+         Hour = ('0' + Data.getHours()).slice(-2);
+         Minutes = ('0' + Data.getMinutes()).slice(-2);
+         Seconds = ('0' + Data.getSeconds()).slice(-2);
+
+         obj.innerHTML--;
+
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+obj.innerHTML+'<br>');
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+url+'<br>');
+
+         if (obj.innerHTML == 0){
+            $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_TRAINING_END#>.<br>');
+            $('#ir_learn_timer').html('');
+            setTimeout(function(){}, 1000);
+         } else {
+            $.ajax({
+               url: url,
+               cache: false,
+               success: function(html){
+                  var resp = tryParseJSON(html);
+                  if (resp !== false) {
+                     if(typeof resp.error === 'undefined') {
+                        if((typeof resp.result !== 'undefined') && (resp.result !== '')) {
+                           
+                           if((typeof resp.result.code !== 'undefined') && (typeof resp.result.key !== 'undefined')) {
+                              if((resp.result.code!=='') && (resp.result.code.length > 10) && (resp.result.key == slot)) {
+                                 $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_SUCCESSFULLY#><br>');
+                                 $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+resp.result.code+'<br>');
+                                 $('#ir_learn_timer').html('');
+                                 setTimeout(function(){}, 1000);
+                                 $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_TRAINING_END#>.<br>');
+                              } else if (resp.result.code==='') {
+                                 setTimeout('learnTimer('+slot+')', 1000);
+                              }  
+                           }
+                        }
+                     } else {
+                        $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_STRING_ERROR#> - '+resp.error.message+'<br>');
+                        $('#ir_learn_timer').html('');
+                        setTimeout(function(){}, 1000);
+                     }
+                  } else {
+                     $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_ERROR#>.<br>');
+                     $('#ir_learn_timer').html('');
+                     setTimeout(function(){}, 1000);
+                  }
+               }
+            });
+         }
+      }
+
+      function tryParseJSON (jsonString) {
+         try {
+            var o = JSON.parse(jsonString);
+            if (o && typeof o === "object") return o;
+         }
+         catch (e) { }
+         return false;
+      };
+
+      function getRandomInt(min, max) {
+         return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+   </script>
+   [#endif#]
+
+   [#if DEVICE_TYPE="lumi.acpartner.v3"#]
+   <script>
+      function startLearnIR() {
+
+         var url="/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=start_ir_learn&dopt=[30]";
+
+         $("#ir_learn_log").html('');
+
+         Data = new Date();
+         Hour = ('0' + Data.getHours()).slice(-2);
+         Minutes = ('0' + Data.getMinutes()).slice(-2);
+         Seconds = ('0' + Data.getSeconds()).slice(-2);
+
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' ip = '+'[#IP#]'+'<br>');
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' token = '+'[#TOKEN#]'+'<br>');
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+url+'<br>');
+
+         $.ajax({
+            url: url,
+            cache: false,
+            success: function(html){
+               //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+html+'<br>');
+               var resp = tryParseJSON(html);
+               if (resp !== false) {
+                  if (typeof resp.error === 'undefined') {
+                     //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+resp.result+'<br>');
+                     if ((typeof resp.result !== 'undefined') && (resp.result === 0 || resp.result == 'ok')) {
+                        $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_TRAINING#>.<br>');
+                        if ($("#ir_learn_timer").html()=='') {
+                           $('#ir_learn_timer').html('20');
+                           setTimeout('learnTimer()', 1000);
+                        }
+                     } else {
+                        $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_STRING_ERROR#> - bad response.<br>');
+                     }
+                  } else {
+                     $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_STRING_ERROR#> - '+resp.error.message+'<br>');
+                  }
+               } else {
+                  $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_ERROR#>.<br>');
+               }
+            }
+         });
+      }
+
+      function learnTimer() {
+         var timer = document.getElementById('ir_learn_timer');
+         var url="/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=get_ir_learn_result&dopt=[]";
+
+         Data = new Date();
+         Hour = ('0' + Data.getHours()).slice(-2);
+         Minutes = ('0' + Data.getMinutes()).slice(-2);
+         Seconds = ('0' + Data.getSeconds()).slice(-2);
+
+         timer.innerHTML--;
+
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+timer.innerHTML+'<br>');
+         //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+url+'<br>');
+
+         if (timer.innerHTML == 0){
+            $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_TRAINING_END#>.<br>');
+            $('#ir_learn_timer').html('');
+            setTimeout(function(){}, 1000);
+            setTimeout(function() {
+               $.ajax({
+                  url: "/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=end_ir_learn&dopt=[]",
+                  cache: false,
+                  success: function(html){
+                     //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+timer.innerHTML+' -> '+html+'<br>');
+                  }
+               });
+            }, 1000);
+         } else {
+            $.ajax({
+               url: url,
+               cache: false,
+               success: function(html){
+                  var resp = tryParseJSON(html);
+                  if (resp !== false) {
+                     if (typeof resp.error === 'undefined') {
+                        if (resp.result[0] !== '(null)' && resp.result[0] !== '') {
+                           $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_SUCCESSFULLY#><br>');
+                           $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+resp.result[0]+'<br>');
+                           timer.innerHTML = 0;
+                           $('#ir_learn_timer').html('');
+                           setTimeout(function() {
+                              $.ajax({
+                                 url: "/ajax/xiaomimiio.html?op=test_api_cmd&dip=[#IP#]&dtoken=[#TOKEN#]&dcmd=end_ir_learn&dopt=[]",
+                                 cache: false,
+                                 success: function(html){
+                                    //$('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' '+timer.innerHTML+' -> '+html+'<br>');
+                                    $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_TRAINING_END#>.<br>');
+                                 }
+                              });
+                           }, 1000);
+                        } else {
+                           setTimeout('learnTimer()', 1000);
+                        }
+                     } else {
+                        $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_STRING_ERROR#> - '+resp.error.message+'<br>');
+                        $('#ir_learn_timer').html('');
+                        setTimeout(function(){}, 1000);
+                     }
+                  } else {
+                     $('#ir_learn_log').append(Hour+":"+Minutes+":"+Seconds+' <#LANG_XIMI_APP_ERROR#>.<br>');
+                     $('#ir_learn_timer').html('');
+                     setTimeout(function(){}, 1000);
+                  }
+               }
+            });
+         }
+      }
+
+      function tryParseJSON (jsonString) {
+         try {
+            var o = JSON.parse(jsonString);
+            if (o && typeof o === "object") return o;
+         }
+         catch (e) { }
+         return false;
+      };
+   </script>
+   [#endif#]
+
+[#endif#]
+
+<script>
+
+var script = document.createElement('script');
+script.src = "../templates/xiaomimiio/css/bootstrap-select.min.js"
+document.body.appendChild(script);
+
+script.onload = function() {
+	// после подгрузки js-файла перерисуем элемент select
+	$('.selectpicker').selectpicker('render');
+}
+
+</script>
