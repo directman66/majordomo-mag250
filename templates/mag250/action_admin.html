@@ -1,0 +1,82 @@
+<div>
+
+[#ONLINE#]
+
+<style>
+.raz {
+  border-spacing: 12.5em 1.3em; /* border-collapse наследуется, применяется только к table или inline-table элементам с border-collapse: separate; */ 
+}
+.raz,
+.raz td {
+  border: 0px solid red;
+padding: .3em 1em
+}
+</style>
+
+
+
+<a href="https://www.infomir.eu/rus/"> 
+<img src="../img/modules/infomirlogo.png" width="20%"  > 
+</a>
+&nbsp;&nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp; &nbsp;&nbsp;
+ &nbsp;&nbsp;<a class="btn btn-default" href="?data_source=<#DATA_SOURCE#>&view_mode=scan&tab=info">SCAN</a>
+
+
+
+ &nbsp; 
+</div>
+
+
+
+	 <ul class="nav nav-tabs">
+
+<br>
+<li [#if TAB=="" || TAB=="info" #] class="active" [#endif#]><a href="?data_source=<#DATA_SOURCE#>&view_mode=&id=<#ID#>&tab=info"><span class="glyphicon glyphicon-list-alt"></span> Информация</a></li>
+<!--<li [#if TAB=="config" #] class="active" [#endif#]><a href="?data_source=<#DATA_SOURCE#>&view_mode=&id=<#ID#>&tab=config"><span class="glyphicon glyphicon-cog"></span> Настройки</a></li>
+<li [#if TAB=="debug" #] class="active" [#endif#]><a href="?view_mode=&tab=debug"><span class="glyphicon glyphicon-inbox"></span> Отладка</a> </li>	
+!-->
+<li [#if TAB=="help" #] class="active" [#endif#]><a href="?view_mode=&tab=help"><span class="glyphicon glyphicon-info-sign"></span> Помощь</a> </li>	
+</ul>
+
+[#if TAB="info"|| TAB==""#] [#inc devlist.html#] [#endif#]
+
+[#if TAB="config"#]
+[#endif#]
+
+[#if TAB="debug"#]
+<br>
+Degug:
+<div>
+[#MSG_DEBUG#]
+
+</div>
+
+ [#endif#]
+
+[#if TAB="help"#] [#inc help.html#] [#endif#]
+
+
+[#if VIEW_MODE="edit_devices"#]
+   [#if ID!=""#]
+      [#if TITLE!=""#]<h4>[#TITLE#]</h4>[#endif TITLE#]
+      <ul class="nav nav-tabs">
+         <li [#if TAB=""#] class="active"[#endif#]>
+            <a href="?data_source=<#DATA_SOURCE#>&view_mode=<#VIEW_MODE#>&id=<#ID#>&tab=info"><#LANG_GENERAL#></a>
+         </li>
+         <li [#if TAB="data"#] class="active"[#endif#]>
+            <a href="?data_source=<#DATA_SOURCE#>&view_mode=<#VIEW_MODE#>&id=<#ID#>&tab=data"><#LANG_DATA#></a>
+         </li>
+      </ul>
+      &nbsp;
+      <br/>
+   [#endif ID#]
+   
+   [#if TAB="info"#]
+      [#inc devices_edit_default.html#]
+   [#endif TAB#]
+   
+   [#if TAB="data"#]
+      [#inc devices_edit_data.html#]
+   [#endif TAB#]
+[#endif VIEW_MODE#]
