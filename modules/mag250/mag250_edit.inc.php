@@ -1,4 +1,4 @@
-<?php
+                 <?php
 /*
 * @version 0.1 (wizard)
 */
@@ -17,61 +17,21 @@
    if ($rec['TITLE']=='') {
     $out['ERR_TITLE']=1;
     $ok=0;
-   }}}
+   }
+
+   global $password;
+   $rec['PASSWORD']=$password;
+   if ($rec['PASSWORD']=='') {
+    $out['ERR_PASSWORD']=1;
+    $ok=0;
+   }
+
+
+}}
   // step: data
-  if ($this->tab=='data') {
-  }
   //UPDATING RECORD
   // step: default
-  if ($this->tab=='') {
-  }
 
-  if ($this->tab=='data') {
-   //dataset2
-   $new_id=0;
-   global $delete_id;
-   if ($delete_id) {
-    SQLExec("DELETE FROM mag250_commands WHERE ID='".(int)$delete_id."'");
-   }
-   $properties=SQLSelect("SELECT * FROM mag250_commands WHERE DEVICE_ID='".$rec['ID']."' ORDER BY ID");
-   $total=count($properties);
-   for($i=0;$i<$total;$i++) {
-    if ($properties[$i]['ID']==$new_id) continue;
-    if ($this->mode=='update') {
-        /*
-      global ${'title'.$properties[$i]['ID']};
-      $properties[$i]['TITLE']=trim(${'title'.$properties[$i]['ID']});
-      global ${'value'.$properties[$i]['ID']};
-      $properties[$i]['VALUE']=trim(${'value'.$properties[$i]['ID']});
-        */
-      global ${'linked_object'.$properties[$i]['ID']};
-      $properties[$i]['LINKED_OBJECT']=trim(${'linked_object'.$properties[$i]['ID']});
-      global ${'linked_property'.$properties[$i]['ID']};
-      $properties[$i]['LINKED_PROPERTY']=trim(${'linked_property'.$properties[$i]['ID']});
-      SQLUpdate('mag250_commands', $properties[$i]);
-
-      $old_linked_object=$properties[$i]['LINKED_OBJECT'];
-      $old_linked_property=$properties[$i]['LINKED_PROPERTY'];
-      if ($old_linked_object && $old_linked_object!=$properties[$i]['LINKED_OBJECT'] && $old_linked_property && $old_linked_property!=$properties[$i]['LINKED_PROPERTY']) {
-       removeLinkedProperty($old_linked_object, $old_linked_property, $this->name);
-      }
-     }
-
-       if ($properties[$i]['LINKED_OBJECT'] && $properties[$i]['LINKED_PROPERTY']) {
-           addLinkedProperty($properties[$i]['LINKED_OBJECT'], $properties[$i]['LINKED_PROPERTY'], $this->name);
-       }
-       
-     if ($properties[$i]['TITLE']=='status') {
-         $properties[$i]['SDEVICE_TYPE']='relay';
-     } elseif ($properties[$i]['TITLE']=='color') {
-         $properties[$i]['SDEVICE_TYPE']='rgb';
-     } elseif ($properties[$i]['TITLE']=='level') {
-         $properties[$i]['SDEVICE_TYPE']='dimmer';
-     }  
-       
-   }
-   $out['PROPERTIES']=$properties;   
-  }
   if (is_array($rec)) {
    foreach($rec as $k=>$v) {
     if (!is_array($v)) {
@@ -80,5 +40,4 @@
    }
   }
   outHash($rec, $out);
-
 
