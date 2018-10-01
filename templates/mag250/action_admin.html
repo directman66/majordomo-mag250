@@ -55,22 +55,7 @@ Degug:
 
 
 [#if VIEW_MODE="edit_devices"#]
-   [#if ID!=""#]
-      [#if TITLE!=""#]<h4>[#TITLE#]</h4>[#endif TITLE#]
-<!--
-      <ul class="nav nav-tabs">
-         <li [#if TAB=""#] class="active"[#endif#]>
-            <a href="?data_source=<#DATA_SOURCE#>&view_mode=<#VIEW_MODE#>&id=<#ID#>&tab=info"><#LANG_GENERAL#></a>
-         </li>
-         <li [#if TAB="data"#] class="active"[#endif#]>
-            <a href="?data_source=<#DATA_SOURCE#>&view_mode=<#VIEW_MODE#>&id=<#ID#>&tab=data"><#LANG_DATA#></a>
-         </li>
 
-      </ul>
-      &nbsp;
-      <br/>
--->
-   [#endif ID#]
    
    [#if TAB="info"#]
       [#inc devices_edit_default.html#]
