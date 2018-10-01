@@ -1,7 +1,13 @@
-                 <?php
+<?php
 /*
 * @version 0.1 (wizard)
 */
+
+echo $this->owner->name;
+echo $this->mode;
+
+echo $this->tab;
+
   if ($this->owner->name=='panel') {
    $out['CONTROLPANEL']=1;
   }
@@ -10,7 +16,7 @@
   if ($this->mode=='update') {
    $ok=1;
   // step: default
-  if ($this->tab=='') {
+  if ($this->tab=='info') {
   //updating '<%LANG_TITLE%>' (varchar, required)
    global $title;
    $rec['TITLE']=$title;
@@ -28,6 +34,15 @@
 
 
 }}
+
+	if ($ok) {
+		if ($rec['ID']) {
+			SQLUpdate($table_name, $rec);
+		} 
+		}
+		
+		$out['OK'] = 1;
+
   // step: data
   //UPDATING RECORD
   // step: default
