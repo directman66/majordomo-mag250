@@ -3,10 +3,9 @@
 * @version 0.1 (wizard)
 */
 
-echo $this->owner->name;
-echo $this->mode;
-
-echo $this->tab;
+//echo $this->owner->name;
+//echo $this->mode;
+//echo $this->tab;
 
   if ($this->owner->name=='panel') {
    $out['CONTROLPANEL']=1;
