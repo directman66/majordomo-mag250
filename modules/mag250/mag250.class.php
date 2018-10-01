@@ -311,22 +311,22 @@ $pwd=$rec['PASSWORD'];
 
 
 if ($msg='keyboard')	$command = array("msgType" => "keyboardRequest" );
-if ($msg='play')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 1,"keycode" => 114,"unicode" => chr(114),"action" => "press");
-if ($msg='fastfoward')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 1,"keycode" => 102,"unicode" => chr(102),"action" => "press" );
-if ($msg='rev')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 1,"keycode" => 98, "unicode" => chr(98), "action" => "press" );
+if ($msg='play')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 134217728,"keycode" => 82,"unicode" => 114,"action" => "press");
+if ($msg='ffwd')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 134217728,"keycode" => 70,"unicode" => 102,"action" => "press" );
+if ($msg='rew')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 134217728,"keycode" => 66,"unicode" => 98,"action" => "press");
+if ($msg='guide')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 134217728,"keycode" => 67108864,"unicode" => 119,"action" => "press" );
+if ($msg='tv')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777273,"unicode" => 121,"action" => "press");
+if ($msg='app')	    	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777275,"unicode" => 123,"action" => "press" );
+if ($msg='info')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 134217728,"keycode" => 89,"unicode" => 121,"action" => "press");
+if ($msg='exit')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777216,"unicode" => 27,"action" => "press");
+if ($msg='back')        $command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777219,"unicode" => 8,"action" => "press");
+if ($msg='menu')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777274,"unicode" => 122,"action" => "press");
+if ($msg='blue')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777267,"unicode" => 115,"action" => "press");
+if ($msg='yellow')   	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777266,"unicode" => 114,"action" => "press" );
+if ($msg='green')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777265,"unicode" => 113,"action" => "press");
+if ($msg='red')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777264,"unicode" => 112,"action" => "press");
 if ($msg='guide')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 119,"unicode" => chr(119),"action" => "press");
-if ($msg='tv')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 122,"unicode" => chr(122),"action" => "press" );
-if ($msg='app')	    	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 123,"unicode" => chr(123),"action" => "press");
-if ($msg='info')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 1,"keycode" => 121,"unicode" => chr(121),"action" => "press");
-if ($msg='exit')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 27, "unicode" => chr(27), "action" => "press");
-if ($msg='back')        $command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 8,  "unicode" => chr(8),  "action" => "press");
-if ($msg='menu')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 122,"unicode" => chr(122),"action" => "press");
-if ($msg='blue')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 115,"unicode" => chr(115),"action" => "press");
-if ($msg='yellow')   	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 114,"unicode" => chr(114),"action" => "press");
-if ($msg='green')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 113,"unicode" => chr(113),"action" => "press");
-if ($msg='red')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 112,"unicode" => chr(112),"action" => "press");
-if ($msg='guide')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 119,"unicode" => chr(119),"action" => "press");
-if ($msg='setting')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 2,"keycode" => 120,"unicode" => chr(120),"action" => "press");
+if ($msg='setting')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777272,"unicode" => 120,"action" => "press" );
 if ($msg='power')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 1,"keycode" => 117,"unicode" => chr(117),"action" => "press");
 if ($msg='mute')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 1,"keycode" => 96, "unicode" => chr(96), "action" => "press");
 if ($msg='reload')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 116,"unicode" => chr(116),"action" => "press");
@@ -340,21 +340,23 @@ if ($msg='7')		$command = array("msgType" => "keyboardKey","action" => "press","
 if ($msg='8')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 56,"unicode" => 8,"action" => "press");
 if ($msg='9')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 57,"unicode" => 9,"action" => "press");
 if ($msg='0')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 48,"unicode" => 0,"action" => "press");
+if ($msg='up')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777235,"unicode" => 38,"action" => "press");
+if ($msg='down')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777237,"unicode" => 40,"action" => "press");
+if ($msg='left')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777234,"unicode" => 37,"action" => "press");
+if ($msg='right')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777236,"unicode" => 39,"action" => "press");
+if ($msg='audiomode')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 134217728,"keycode" => 71,"unicode" => 0,"action" => "press");
+if ($msg='stop')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 134217728,"keycode" => 83,"unicode" => 115,"action" => "press");
+if ($msg='size')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 67108864,"keycode" => 16777269,"unicode" => 11,"action" => "press");
+if ($msg='reload')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777272,"unicode" => 116,"action" => "press" );
+if ($msg='home')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777216,"unicode" => 27,"action" => "press");
+if ($msg='ok')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 16777220,"unicode" => 13,"action" => "press");
+if ($msg='volumedown')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 45,"unicode" => 45,"action" => "press");
+if ($msg='volumeup')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 43,"unicode" => 43,"action" => "press");
 
 
-
-    $answer = $this->send_command($ip, $command, $pwd);
-    return $answer;
+ $answer = $this->send_command($ip, $command, $pwd);
+ return $answer;
  }
-
-
-
-
-
-
-
-
-
 
 
 /**
