@@ -304,7 +304,7 @@ function delete_once($id) {
 
 
 
-function sendkay($id, $msg) {
+function sendkey($id, $msg) {
 $rec=SQLSelectOne("select *  FROM mag250_devices WHERE id=".$id);
 $ip=$rec['IP'];
 $pwd=$rec['PASSWORD'];
@@ -340,9 +340,6 @@ if ($msg='7')		$command = array("msgType" => "keyboardKey","action" => "press","
 if ($msg='8')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 56,"unicode" => 8,"action" => "press");
 if ($msg='9')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 57,"unicode" => 9,"action" => "press");
 if ($msg='0')		$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 48,"unicode" => 0,"action" => "press");
-
-
-
 
 
 
@@ -519,7 +516,7 @@ $ret='';
 $par=json_decode($response[0], true);
 $par=json_decode($buf, true);
 
-print_r( $response);
+//print_r( $response);
 //echo "1".$par."<br>";
 echo "1".$response[0]['type'];
 
@@ -638,23 +635,6 @@ function encrypt_answer($text, $password)
 */
 
 
-//info          81:8a:8b:96
-//Р Р†Р С”Р В» 		71:23:0f:a3
-//Р Р†РЎвЂ№Р С”Р В» 		71:24:0f:a4
-//color         1 1 1 	31:01:01:01:00:f0:0f:33
-//3100:00:00:00:f0:0f:30
-//3100ff0000f00f2f
-//  3100ff0000f00f2f
-//  3100ff0000f00f2f
-//31ff:ff:ff:00:f0:0f:2d
-//31ff:00:ff:00:f0:0f:2e
-//31ff:ff:00:00:f0:0f:2e
-	
-
-//level
-//31:00:00:00:05:0f:0f:54 //1%
-//31:00:00:00:7f:0f:0f:ce //50%
-//31:00:00:00:ff:0f:0f:4e //100 %
 
 
 // sudo tcpdump  ip dst 192.168.1.82 and  ip src 192.168.1.39 -w dump.cap
