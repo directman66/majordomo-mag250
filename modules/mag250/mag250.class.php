@@ -353,8 +353,11 @@ if ($msg='ok')		$command = array("msgType" => "keyboardKey","action" => "press",
 if ($msg='volumedown')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 45,"unicode" => 45,"action" => "press");
 if ($msg='volumeup')	$command = array("msgType" => "keyboardKey","action" => "press","metaState" => 0,"keycode" => 43,"unicode" => 43,"action" => "press");
 
-
+//echo $ip, $command, $pwd;
  $answer = $this->send_command($ip, $command, $pwd);
+echo $answer;
+sqlexec("update mag250_devices set STATE='".$answer."' where ID=".$id);
+
  return $answer;
  }
 
@@ -415,6 +418,7 @@ if ($msg='volumeup')	$command = array("msgType" => "keyboardKey","action" => "pr
  mag250_devices: LASTPING varchar(100) NOT NULL DEFAULT ''
  mag250_devices: FIND varchar(100) NOT NULL DEFAULT ''
  mag250_devices: MODEL varchar(100) NOT NULL DEFAULT ''
+ mag250_devices: STATE varchar(100) NOT NULL DEFAULT ''
  mag250_devices: LINKED_OBJECT varchar(100) NOT NULL DEFAULT ''
  mag250_devices: LINKED_PROPERTY varchar(100) NOT NULL DEFAULT ''
 EOD;
