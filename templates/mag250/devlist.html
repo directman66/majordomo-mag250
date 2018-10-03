@@ -19,10 +19,13 @@
 <td>
 <b>Название:</b></br>
  [#TITLE#]
+ [#if PASSWORD=""#] <br><font color="red">Не задан пароль </font>[#endif#]
 
 <br><br><br>
 <b>Модель:</b></br>
  [#MODEL#]
+
+
 <br><br><br>
   <a href="?data_source=<#DATA_SOURCE#>&view_mode=edit_devices&id=[#ID#]&tab=info" class="btn btn-default" title="Редактировать"><i class="glyphicon glyphicon-pencil"></i></a>
   <a href="?view_mode=delete_devices&id=[#ID#]&tab=info" onClick="return confirm('Are you sure? Please confirm.')" class="btn btn-default" title="<#LANG_DELETE#>"><i class="glyphicon glyphicon-trash"></i></a> 
