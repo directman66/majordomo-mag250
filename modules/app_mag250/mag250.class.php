@@ -9,7 +9,7 @@
 //
 //
 //ini_set('max_execution_time', '600');
-class mag250 extends module {
+class app_mag250 extends module {
 /**
 * milur
 *
@@ -17,7 +17,7 @@ class mag250 extends module {
 *
 * @access private
 */
-function mag250() {
+function app_mag250() {
   $this->name="mag250";
   $this->title="mag250";
   $this->module_category="<#LANG_SECTION_DEVICES#>";
