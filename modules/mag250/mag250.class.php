@@ -524,7 +524,7 @@ $par=json_decode($buf, true);
 
 //print_r( $response);
 //echo "1".$par."<br>";
-echo "1".$response[0]['type'];
+//echo "1".$response[0]['type'];
 
 $model=$par['type'];
 $name=$par['name'];
