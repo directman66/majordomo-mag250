@@ -3,9 +3,9 @@
 * @version 0.1 (wizard)
 */
 
-//echo $this->owner->name;
-//echo $this->mode;
-//echo $this->tab;
+echo $this->owner->name;
+echo $this->mode;
+echo $this->tab;
 
   if ($this->owner->name=='panel') {
    $out['CONTROLPANEL']=1;
@@ -33,14 +33,16 @@
 
 
 }}
-
-	if ($ok) {
-		if ($rec['ID']) {
-			SQLUpdate($table_name, $rec);
+//echo "ok:".$ok."   rec[id]:".$rec['ID'];
+	if (($ok==0) and  ($rec['ID'])) {
+//echo "runapdate";
+	SQLUpdate($table_name, $rec);
+	$out['OK'] = 1;
 		} 
-		}
+
+
 		
-		$out['OK'] = 1;
+
 
   // step: data
   //UPDATING RECORD
