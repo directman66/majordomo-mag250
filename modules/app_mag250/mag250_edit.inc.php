@@ -3,9 +3,9 @@
 * @version 0.1 (wizard)
 */
 
-echo $this->owner->name;
-echo $this->mode;
-echo $this->tab;
+//echo $this->owner->name;
+//echo $this->mode;
+//echo $this->tab;
 
   if ($this->owner->name=='panel') {
    $out['CONTROLPANEL']=1;
@@ -18,6 +18,7 @@ echo $this->tab;
   if ($this->tab=='info') {
   //updating '<%LANG_TITLE%>' (varchar, required)
    global $title;
+echo $title;
    $rec['TITLE']=$title;
    if ($rec['TITLE']=='') {
     $out['ERR_TITLE']=1;
@@ -31,10 +32,20 @@ echo $this->tab;
     $ok=0;
    }
 
+   global $ip;
+   $rec['IP']=$ip;
+   if ($rec['IP']=='') {
+    $out['ERR_IP']=1;
+    $ok=0;
+   }
+
 
 }}
 //echo "ok:".$ok."   rec[id]:".$rec['ID'];
-	if (($ok==0) and  ($rec['ID'])) {
+	if (($ok==1) 
+//and  ($rec['ID'])
+) 
+{
 //echo "runapdate";
 	SQLUpdate($table_name, $rec);
 	$out['OK'] = 1;
