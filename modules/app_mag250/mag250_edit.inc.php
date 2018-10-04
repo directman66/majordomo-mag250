@@ -18,7 +18,7 @@
   if ($this->tab=='info') {
   //updating '<%LANG_TITLE%>' (varchar, required)
    global $title;
-echo $title;
+//echo $title;
    $rec['TITLE']=$title;
    if ($rec['TITLE']=='') {
     $out['ERR_TITLE']=1;
