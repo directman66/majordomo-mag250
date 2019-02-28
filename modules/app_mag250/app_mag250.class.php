@@ -189,11 +189,27 @@ $ip=$mhdevices[$i]['IP'];
 $lastping=$mhdevices[$i]['LASTPING'];
 //echo time()-$lastping;
 if (time()-$lastping>300) {
+
+$cmd='
+$online=ping(processTitle("'.$ip.'"));
+if ($online) 
+{SQLexec("update mag250_devices set ONLINE=1, LASTPING='.time().' where IP=\''.$ip.'\'");} 
+else 
+{SQLexec("update mag250_devices set ONLINE=0, LASTPING='.time().' where IP=\''.$ip.'\'");}
+
+';
+ SetTimeOut('mag250_devicesping',$cmd, '1'); 
+
+
+/*
+
 $online=ping(processTitle($ip));
     if ($online) 
 {SQLexec("update mag250_devices set ONLINE='1', LASTPING=".time()." where IP='$ip'");} 
 else 
 {SQLexec("update mag250_devices set ONLINE='0', LASTPING=".time()." where IP='$ip'");}
+*/
+
 }}
 
 
